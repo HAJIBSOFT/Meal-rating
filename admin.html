@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>لوحة الإدارة | نظام تقييم الوجبات</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <div class="bg-decoration"></div>
+
+  <!-- شاشة تسجيل الدخول -->
+  <div id="loginOverlay" class="login-overlay">
+    <div class="card login-card">
+      <p class="muted">ادخل كلمة المرور للمتابعة</p>
+      <form id="pinForm">
+        <div class="form-group">
+          <input
+            type="password"
+            id="adminPinInput"
+            placeholder="******"
+            inputmode="numeric"
+            required
+          />
+        </div>
+        <p id="loginError" class="error-text hidden">رمز المرور غير صحيح</p>
+        <button type="submit" id="loginBtn" class="btn btn-primary btn-block">دخول</button>
+      </form>
+      <a href="index.html" class="back-link">← صفحة التقييم</a>
+    </div>
+  </div>
+
+  <!-- لوحة التحكم -->
+  <div id="adminDashboard" class="hidden">
+    <header class="top-header">
+      <div class="container header-flex">
+        <div class="brand">
+          <div>
+            <h1>لوحة تحكم الإدارة</h1>
+            <p class="subtitle">إدارة الوجبات، المشاريع، وتحليل التقييمات</p>
+          </div>
+        </div>
+        <div class="header-actions">
+          <a href="index.html" class="btn btn-ghost btn-sm">صفحة التقييم</a>
+          <button id="refreshAdminBtn" class="btn btn-ghost btn-sm" title="تحديث البيانات"> تحديث</button>
+          <button id="logoutBtn" class="btn btn-danger-ghost btn-sm">خروج</button>
+        </div>
+      </div>
+    </header>
+
+    <main class="container main-content admin-container">
+      <!-- التبويبات -->
+      <nav class="tabs-nav">
+        <button class="tab-btn active" data-tab="tabAnalytics"> التقييمات والإحصائيات</button>
+        <button class="tab-btn" data-tab="tabMeal"> وجبة اليوم</button>
+        <button class="tab-btn" data-tab="tabProjects"> المشاريع</button>
+      </nav>
+
+      <!-- تبويب 1: الإحصائيات والتقييمات -->
+      <section id="tabAnalytics" class="tab-content active">
+        <!-- الفلاتر -->
+        <div class="card filter-bar">
+          <div class="filter-group">
+            <label for="filterMealSelect">الوجبة / التاريخ:</label>
+            <select id="filterMealSelect">
+              <option value="ALL">جميع الوجبات</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <label for="filterProjectSelect">المشروع / المكان:</label>
+            <select id="filterProjectSelect">
+              <option value="ALL">جميع المشاريع</option>
+            </select>
+          </div>
+           </div>
+
+        <!-- بطاقات المؤشرات -->
+        <div class="kpi-grid">
+          <div class="card kpi-card">
+            <span class="kpi-label">متوسط التقييم</span>
+            <div class="kpi-value" id="statAvgRating">0.0</div>
+            <div class="kpi-sub" id="statAvgStars">☆☆☆☆☆</div>
+          </div>
+          <div class="card kpi-card">
+            <span class="kpi-label">عدد التقييمات</span>
+            <div class="kpi-value" id="statTotalCount">0</div>
+</div>
+          <div class="card kpi-card">
+            <span class="kpi-label">الرغبة في التكرار</span>
+            <div class="kpi-value" id="statRepeatRate">0%</div>
+            <div class="kpi-sub">أجابوا بـ "نعم"</div>
+          </div>
+        </div>
+
+        <!-- توزيع التقييمات -->
+        <div class="charts-grid">
+          <div class="card">
+            <h3 class="section-heading">التقييم</h3>
+            <div id="ratingDistribution" class="dist-list"></div>
+          </div>
+          <div class="card">
+            <h3 class="section-heading">احتمالية تكرار الوجبة</h3>
+            <div id="repeatDistribution" class="dist-list"></div>
+          </div>
+        </div>
+
+        <!-- قائمة المقيمين -->
+        <div class="card">
+          <h3 class="section-heading">سجل التقييمات</h3>
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>الموظف</th>
+                  <th>المشروع</th>
+                  <th>الوجبة</th>
+                  <th>التقييم</th>
+                  <th>التكرار</th>
+                  <th>الملاحظات</th>
+                 
+                </tr>
+              </thead>
+              <tbody id="evaluationsBody"></tbody>
+            </table>
+          </div>
+          <p id="evaluationsEmpty" class="empty-msg hidden">لا توجد تقييمات مطابقة للبحث.</p>
+        </div>
+      </section>
+
+      <!-- تبويب 2: إدارة وجبة اليوم -->
+      <section id="tabMeal" class="tab-content">
+        <div class="card">
+          <div class="meal-admin-header">
+            <div>
+              <h3 class="section-heading">إعداد وجبة اليوم</h3>
+              <p class="muted" id="todayDateDisplay"></p>
+            </div>
+            <div class="meal-status-controls">
+              <span id="todayStatusBadge" class="badge badge-neutral">غير مضافة</span>
+              <button id="toggleStatusBtn" class="btn btn-secondary btn-sm hidden"></button>
+              <button id="deleteMealBtn" class="btn btn-danger-ghost btn-sm hidden">حذف الوجبة</button>
+            </div>
+          </div>
+
+          <form id="mealForm">
+            <div class="form-group">
+              <label for="mealNameInput">اسم الوجبة <span class="req">*</span></label>
+              <input type="text" id="mealNameInput" placeholder="" required />
+            </div>
+
+            <div class="form-group">
+              <label for="mealDescInput">الوصف</label>
+              <textarea id="mealDescInput" rows="2" placeholder=""></textarea>
+            </div>
+
+            <div class="form-group">
+              <label for="mealImageInput">الصورة</label>
+              <label class="upload-area" for="mealImageInput">
+                <span class="upload-icon"></span>
+                <span>اختيار صورة</span>
+                </label>
+              <input type="file" id="mealImageInput" accept="image/*" class="hidden-file" />
+
+              <div id="imagePreviewWrapper" class="image-preview-wrap hidden">
+                <img id="imagePreview" src="" alt="معاينة الصورة" />
+                <button type="button" id="removeImageBtn" class="btn btn-danger-ghost btn-sm">
+                   إزالة الصورة
+                </button>
+              </div>
+            </div>
+
+            <button type="submit" id="saveMealBtn" class="btn btn-primary btn-block">
+              حفظ ونشر وجبة اليوم
+            </button>
+          </form>
+        </div>
+      </section>
+
+      <!-- تبويب 3: إدارة المشاريع والمواقع -->
+      <section id="tabProjects" class="tab-content">
+        <div class="card">
+          <h3 class="section-heading">المشاريع والمواقع المتاحة في الاستبيان</h3>
+          <form id="addProjectForm" class="inline-form">
+            <input type="text" id="newProjectName" placeholder="" required />
+            <button type="submit" id="addProjectBtn" class="btn btn-primary"> إضافة</button>
+          </form>
+
+          <ul id="projectsList" class="projects-list"></ul>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div id="toast" class="toast hidden"></div>
+
+  <script src="js/config.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/admin.js"></script>
+</body>
+</html>

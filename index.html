@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>تقييم الوجبة اليومية</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <div class="bg-decoration"></div>
+
+  <header class="top-header">
+    <div class="container header-flex">
+      <div class="brand">
+       
+        <div>
+          <h1>تقييم الوجبة اليومية</h1>
+          <p class="subtitle">رأيك يهمنا لتحسين جودة الوجبات المقدمة</p>
+        </div>
+      </div>
+      
+    </div>
+  </header>
+
+  <main class="container main-content">
+    <!-- حالة التحميل -->
+    <section id="loadingState" class="card state-card">
+      <div class="spinner"></div>
+      <p>الرجاء الانتظار</p>
+    </section>
+
+    <!-- حالة عدم توفر وجبة أو انتهاء وقت التقييم -->
+    <section id="unavailableState" class="card state-card hidden">
+      <h2 id="unavailableTitle">انتهى وقت التقييم</h2>
+      <p id="unavailableDesc" class="muted">
+        لا توجد وجبة متاحة للتقييم في الوقت الحالي، نرجو المحاولة عند توفر وجبة جديدة.
+      </p>
+    </section>
+
+    <!-- حالة التقييم المسبق (محمي بالكوكيز) -->
+    <section id="alreadyVotedState" class="card state-card hidden">
+      <div class="state-emoji">✅</div>
+      <h2>شكراً لمشاركتك!</h2>
+      <p class="muted">بالعافية عليك,لقد تم ارسال تقييمك </p>
+      <div id="votedMealBadge" class="voted-meal-pill hidden"></div>
+    </section>
+
+    <!-- قسم التقييم الرئيسي -->
+    <section id="evaluationSection" class="hidden">
+      <!-- بطاقة وجبة اليوم -->
+      <article class="card meal-showcase">
+        <div id="mealImageContainer" class="meal-image-wrap hidden">
+          <img id="mealImage" src="" alt="صورة وجبة اليوم" loading="lazy" />
+        </div>
+        <div class="meal-info">
+          <div class="meal-badges">
+            <span id="mealDateBadge" class="badge badge-neutral"></span>
+          </div>
+          <h2 id="mealName" class="meal-title"></h2>
+          <p id="mealDescription" class="meal-desc hidden"></p>
+        </div>
+      </article>
+
+      <!-- نموذج التقييم -->
+      <form id="evalForm" class="card form-card" novalidate>
+        <h3 class="section-heading">شاركنا تقييمك</h3>
+
+        <div class="form-group">
+          <label for="employeeName">اسم الموظف <span class="req">*</span></label>
+          <input
+            type="text"
+            id="employeeName"
+            placeholder="أدخل اسمك الكريم"
+            required
+            autocomplete="name"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="projectSelect">المشروع <span class="req">*</span></label>
+          <select id="projectSelect" required>
+            <option value="">اختر المشروع أو الموقع...</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>تقييم الوجبة <span class="req">*</span></label>
+          <div class="star-rating" id="starRating" role="radiogroup" aria-label="تقييم الوجبة">
+            <button type="button" class="star-btn" data-value="1" aria-label="نجمة واحدة">★</button>
+            <button type="button" class="star-btn" data-value="2" aria-label="نجمتان">★</button>
+            <button type="button" class="star-btn" data-value="3" aria-label="3 نجوم">★</button>
+            <button type="button" class="star-btn" data-value="4" aria-label="4 نجوم">★</button>
+            <button type="button" class="star-btn" data-value="5" aria-label="5 نجوم">★</button>
+          </div>
+          <input type="hidden" id="ratingValue" value="" />
+          <div id="ratingText" class="rating-label">اختر عدد النجوم</div>
+        </div>
+
+        <div class="form-group">
+          <label>احتمالية تكرار الوجبة مستقبلاً <span class="req">*</span></label>
+          <div class="choice-grid">
+            <label class="choice-card">
+              <input type="radio" name="repeatChoice" value="نعم" />
+              <span class="choice-box">
+                <span class="choice-icon">👍</span>
+                <span>نعم، أتمنى تكرارها</span>
+              </span>
+            </label>
+            <label class="choice-card">
+              <input type="radio" name="repeatChoice" value="ربما" />
+              <span class="choice-box">
+                <span class="choice-icon">🤔</span>
+                <span>ربما</span>
+              </span>
+            </label>
+            <label class="choice-card">
+              <input type="radio" name="repeatChoice" value="لا" />
+              <span class="choice-box">
+                <span class="choice-icon">👎</span>
+                <span>لا أفضل تكرارها</span>
+              </span>
+            </label>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="notes">ملاحظات أو اقتراحات (اختياري)</label>
+          <textarea
+            id="notes"
+            rows="3"
+            placeholder="أخبرنا بملاحظاتك حول الطعم، الكمية، الحرارة، أو التغليف..."
+          ></textarea>
+        </div>
+
+        <button type="submit" id="submitBtn" class="btn btn-primary btn-block">
+          إرسال التقييم
+        </button>
+      </form>
+    </section>
+  </main>
+
+  <div id="toast" class="toast hidden"></div>
+
+  <script src="js/config.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
