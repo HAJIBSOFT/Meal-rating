@@ -88,7 +88,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       if (!res.meal) {
         showUnavailable(
-          "لا توجد وجبة اليوم",
+          "انتهى وقت التقييم",
           "لم يتم إضافة وجبة لهذا اليوم بعد أو انتهى وقت التقييم.",
           "🍽️"
         );
@@ -146,7 +146,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function showUnavailable(title, desc, icon = "⏰") {
-    unavailableIcon.textContent = icon;
+    if (unavailableIcon) unavailableIcon.textContent = icon;
     unavailableTitle.textContent = title;
     unavailableDesc.textContent = desc;
     unavailableState.classList.remove("hidden");
